@@ -1,0 +1,5 @@
+{
+  "name": "InfraInsight - Architecture Optimization Showcase",
+  "description": "A dashboard visualizing infrastructure bottlenecks and recommendations for Serverless and Kubernetes scenarios, featuring an AI-powered insights assistant.",
+  "requestFramePermissions": []
+}
