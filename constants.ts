@@ -46,7 +46,7 @@ const serverlessMetrics = {
   errors: {
     label: 'Error Rate (5XX)',
     unit: ' count',
-    data: generateTimeSeries(20, 0, 0, 0, -1, 's').map((d, i) => {
+    data: generateTimeSeries(20, 0, 0, 0, -1, 'h').map((d, i) => {
         // Errors during bulk insert simulation
         if (i > 10 && i < 15) return { ...d, value: 3, optimizedValue: 0 };
         return { ...d, value: 0, optimizedValue: 0 };
