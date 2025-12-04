@@ -1,7 +1,14 @@
 import { MetricPoint, Observation, Recommendation, ScenarioData, ScenarioType } from './types';
 
 // Helper to generate mock time series data
-const generateTimeSeries = (points: number, base: number, variance: number, trend: number = 0, spikeIndex: number = -1): MetricPoint[] => {
+const generateTimeSeries = (
+  points: number, 
+  base: number, 
+  variance: number, 
+  trend: number = 0, 
+  spikeIndex: number = -1,
+  timeUnit: string = 's'
+): MetricPoint[] => {
   return Array.from({ length: points }, (_, i) => {
     let val = base + Math.random() * variance + (i * trend);
     // Simulate a spike
@@ -13,7 +20,7 @@ const generateTimeSeries = (points: number, base: number, variance: number, tren
     const optVal = Math.max(0, val * 0.4 + (Math.random() * variance * 0.2));
 
     return {
-      time: `${i}s`,
+      time: `${i}${timeUnit}`,
       value: Number(val.toFixed(1)),
       optimizedValue: Number(optVal.toFixed(1)),
     };
@@ -24,7 +31,7 @@ const serverlessMetrics = {
   latency: {
     label: 'Cold Start Latency',
     unit: 'ms',
-    data: generateTimeSeries(20, 100, 50, 0, 0).map((d, i) => {
+    data: generateTimeSeries(20, 100, 50, 0, 0, 's').map((d, i) => {
         // Cold start spike at beginning
         if(i === 0) return { ...d, value: 980, optimizedValue: 150 }; 
         // Subsequent calls lower but still fluctuating
@@ -34,12 +41,12 @@ const serverlessMetrics = {
   memory: {
     label: 'Memory Utilization',
     unit: '%',
-    data: generateTimeSeries(20, 95, 5).map(d => ({ ...d, value: Math.min(100, d.value), optimizedValue: 40 }))
+    data: generateTimeSeries(20, 95, 5, 0, -1, 'h').map(d => ({ ...d, value: Math.min(100, d.value), optimizedValue: 40 }))
   },
   errors: {
     label: 'Error Rate (5XX)',
     unit: ' count',
-    data: generateTimeSeries(20, 0, 0).map((d, i) => {
+    data: generateTimeSeries(20, 0, 0, 0, -1, 's').map((d, i) => {
         // Errors during bulk insert simulation
         if (i > 10 && i < 15) return { ...d, value: 3, optimizedValue: 0 };
         return { ...d, value: 0, optimizedValue: 0 };
@@ -51,12 +58,12 @@ const k8sMetrics = {
   dnsErrors: {
     label: 'NXDOMAIN Errors',
     unit: '%',
-    data: generateTimeSeries(20, 75, 10).map(d => ({ ...d, value: Math.min(100, d.value), optimizedValue: 2 }))
+    data: generateTimeSeries(20, 75, 10, 0, -1, 'h').map(d => ({ ...d, value: Math.min(100, d.value), optimizedValue: 2 }))
   },
   memory: {
     label: 'Memory Usage',
     unit: 'MB',
-    data: generateTimeSeries(20, 2048, 100).map(d => ({ ...d, value: 500, optimizedValue: 2048 })) // Underutilization: Used 500, Provisioned 2048. Opt: Used 500, Provisioned ~600
+    data: generateTimeSeries(20, 2048, 100, 0, -1, 'h').map(d => ({ ...d, value: 500, optimizedValue: 2048 })) // Underutilization: Used 500, Provisioned 2048. Opt: Used 500, Provisioned ~600
   }
 };
 
